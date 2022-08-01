@@ -1,17 +1,35 @@
 package br.com.enviar_mail;
 
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.util.List;
 import java.util.Properties;
 
+import javax.activation.DataHandler;
 import javax.mail.Address;
 import javax.mail.Authenticator;
 import javax.mail.Message;
+import javax.mail.Multipart;
+import javax.mail.MultipartDataSource;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
 
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
+import javax.mail.util.ByteArrayDataSource;
+
+import com.itextpdf.text.Chunk;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.ElementListener;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfWriter;
 
 public class ObjetoEnviarEmail {
 	//DECLARAÇÃO DE VARIAVEIS
@@ -58,12 +76,31 @@ public class ObjetoEnviarEmail {
 	message.setRecipients(Message.RecipientType.TO, toUser);
 	message.setSubject(assuntoEmail);
 	
+MimeBodyPart corpoEmail = new MimeBodyPart();
+
+//PRIMEIRA PARTE DO EMAIL
+
 	if (envioHtml) {
-		message.setContent(textoEmail, "text/html; charset = utf-8");
+		corpoEmail.setContent(textoEmail, "text/html; charset = utf-8");
 	}else {
-		message.setText(textoEmail);
+		corpoEmail.setText(textoEmail);
 	}
 	
+// 2ª parte que é o anexo de documentos no email
+	
+MimeBodyPart anexoEmail = new MimeBodyPart();
+
+anexoEmail.setDataHandler(new DataHandler(new ByteArrayDataSource(simuladorPDF(), "application/pdf")));
+anexoEmail.setFileName("anexoEmail.pdf");
+	
+	//JUNTAR AS PARTE DO EMAIL
+	Multipart multipart = new MimeMultipart();
+	
+	multipart.addBodyPart(corpoEmail);//PRIMEIRA PARTE
+	multipart.addBodyPart(anexoEmail);//SEGUNDA PARTE
+	
+	//JUNTANDO AS PARTE DO EMAIL
+	message.setContent(multipart);
 
 	//CLASSE RESPONSAVEL PARA TRANSPORTAR A MENSAGEM
 	Transport.send(message);
@@ -74,6 +111,22 @@ public class ObjetoEnviarEmail {
 		
 	}
 	
+	
+	//CRIANDO ARQUIVO PDF PARA ANEXO NO EMAIL
+	
+	public FileInputStream simuladorPDF()throws Exception{
+
+		 Document document = new Document();//cria documento
+		 File file = new File("fileAnexo.pdf");//pega o Arquivo
+		file.createNewFile();//criar o arquivo
+		 PdfWriter.getInstance(document, new FileOutputStream(file));//Pega o arquivo e joga no ducumento
+		 document.open();
+		 document.add(new Paragraph("Conteudo do anexo gerado pelo pdf"));
+		 document.close();
+		 
+		 return new FileInputStream(file);
+	
+	}
 	
 	
 
