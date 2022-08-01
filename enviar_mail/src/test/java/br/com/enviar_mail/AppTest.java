@@ -4,17 +4,6 @@ package br.com.enviar_mail;
 
 
 
-import java.util.Properties;
-
-import javax.mail.Address;
-import javax.mail.Authenticator;
-import javax.mail.Message;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-
 
 
 
@@ -23,53 +12,35 @@ import javax.mail.internet.MimeMessage;
  */
 public class AppTest {
 	
-	private String userName ="giancarlomuniz12@gmail.com";
-	private String senha = "ngbiishdaifzgdty";
+
 	
 @org.junit.Test
 
 
-public void testeEmail() {
+public void testeEmail() throws Exception {
 	
-
-	try {
+	StringBuilder builderTexto = new StringBuilder();
 	
-	Properties properties = new Properties();
-		properties.put("mail.smtp.auth", "true");/*Autorização*/
-		properties.put("mail.smtp.starttls", "true"); /*Autenticação*/
-		properties.put("mail.smtp.host", "smtp.gmail.com"); /*Sercidor gmail Google*/
-		properties.put("mail.smtp.port", "465");/*Porta do servidor*/
-		properties.put("mail.smtp.socketFactory.port", "465");/*Expecifica a porta a ser conectada pelo socket*/
-		properties.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");/*Classe socket de conexão ao SMTP*/
-		
-		Session session = Session.getInstance(properties, new Authenticator() {
-			@Override
-			protected PasswordAuthentication getPasswordAuthentication() {
-				return new PasswordAuthentication(userName, senha);
-			}
-		});
-		
-	Address []toUser = InternetAddress.parse("munizgiancarlo@gmail.com");
+	builderTexto.append("Olá, <br/><br/>");
+	builderTexto.append("Você está recebendo o acesso ao curso de Java.<br/><br/>");
+	builderTexto.append("Para ter acesso clique no botão abaixo.<br/><br/>");
 	
-	Message message = new MimeMessage(session);
-	message.setFrom(new InternetAddress(userName,"Giancarlo Muniz"));
-	message.setRecipients(Message.RecipientType.TO, toUser);
-	message.setSubject("Teste Email");
-	message.setText("Ola Estamos enviado email de teste");
+	builderTexto.append("<b>Login:</b> alex@jsjsjsj.com<br/>");
+	builderTexto.append("<b>Senha:</b> sdss8s98s<br/><br/>");
 	
-	Transport.send(message);
-		
-
-	      System.out.println("Feito!!!");
-	   
-		
-	}catch (Exception e) {
-e.printStackTrace();	}
+	builderTexto.append("<a target=\"_blank\" href=\"http://projetojavaweb.com/certificado-aluno/login\" style=\"color:#2525a7; padding: 14px 25px; text-align:center; text-decoration: none; display:inline-block; border-radius:30px; font-size:20px; font-family:courier; border : 3px solid green;background-color:#99DA39;\">Acessar Portal do Aluno</a><br/><br/>");
 	
-
+	builderTexto.append("<span style=\"font-size:8px\">Ass.: Alex do JDev Treinamento</span>");
 	
 	
+	ObjetoEnviarEmail enviarEmail = new ObjetoEnviarEmail("munizgiancarlo@gmail.com", 
+			"Giancarlo Muniz", 
+			"Enviar email", 
+			builderTexto.toString());
+	
+	enviarEmail.enviarEmail(true);
 }
+
 	
 	
 }
